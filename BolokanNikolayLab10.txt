@@ -1,0 +1,49 @@
+Create proc sperson_insert
+@sp_name varchar(50),
+@sp_lname varchar(50),
+@name_office varchar(50),
+@man_name varchar(50),
+@man_lname varchar(50),
+@comm_new int
+as
+declare @sp_full_name varchar(50),
+@man_full_name varchar(50),
+@check_sp_name int,
+@check_man_name int
+Select @sp_full_name = @sp_name+' '+@sp_lname
+Select @man_full_name= @man_name+' '+@man_lname
+
+Select @check_sp_name = count(*) from Sperson where [sp_name]=@sp_full_name
+if(@check_sp_name>0)
+begin
+print 'Name Sperson exists!!!';
+return;
+end
+declare @sp_id_new int
+select @sp_id_new=max(sp_id)+1 from Sperson;
+
+Select @check_man_name = count(*) from Sperson where [sp_name]=@man_full_name
+if(@check_man_name=0)
+begin
+print ' Man_name not exists!!!';
+return;
+end
+else declare @man_id_new int
+select @man_id_new = sp_id from Sperson where [sp_name]=@man_full_name
+
+declare @id_of_new int;
+declare @check_office int;
+select @check_office=count(*) from Office where [office]=@name_office
+if(@check_office=0)
+begin
+Select @id_of_new= max(of_id)+1 from Office;
+insert into Office(of_id,office)values(@id_of_new,@name_office);
+end
+else select @id_of_new= of_id from Office where [office]=@name_office
+
+insert into Sperson(sp_id,sp_name,man_id,of_id,comm)
+values (@sp_id_new,@sp_full_name,@man_id_new,@id_of_new,@comm_new);
+--------------------------------------------------------------------
+exec sperson_insert'Bolokan','Nikolay','Chisinau','Fransua','Muar',50
+exec sperson_insert'Vasia','Pupkin','Chisinau','Bolokan','Nikolay',1
+ 
